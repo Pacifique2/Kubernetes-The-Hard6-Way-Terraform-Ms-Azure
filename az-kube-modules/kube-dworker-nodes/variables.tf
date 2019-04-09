@@ -44,7 +44,8 @@ variable "kube_az_tags" {
   type = "map"
 
   default {
-    environment = "Test-DevoLab"
+    POD_CIDR = "10.200.0.0/24"
+    #environment = "Test-DevoLab"
   }
 }
 

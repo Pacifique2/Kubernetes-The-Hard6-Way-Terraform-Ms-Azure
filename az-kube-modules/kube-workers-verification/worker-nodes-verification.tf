@@ -4,6 +4,7 @@
 
 resource "null_resource" "kube_worker_nodes_verification" {
   #count  = "${var.count}"
+  depends_on  = ["null_resource.start_worker_services"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,0)}"

@@ -9,7 +9,8 @@
 # Download and Install the Kubernetes workers' binaries                                                                                                                 
                                                                                                                                                                           
 resource "null_resource" "kube_workers_binaries" {                                                                                                                          
-  count  = "${var.count}"                                                                                                                                                 
+  count  = "${var.count}"                       
+  depends_on = ["null_resource.cluster_role_binding","azurerm_lb_rule.lb","null_resource.kube_api_server_version_test"] 
   connection {                                                                                                                                                            
     type         = "ssh"                                                                                                                                                  
     host = "${element(var.worker_dns_names,count.index)}"                                                                                                             
@@ -47,7 +48,7 @@ resource "null_resource" "kube_workers_binaries" {
 
 resource "null_resource" "cni_network" {
   count = "${var.count}"
-
+  depends_on = ["null_resource.kube_workers_binaries"]
   connection {
     type         = "ssh"
     host = "${element(var.worker_dns_names,count.index)}"
@@ -59,21 +60,21 @@ resource "null_resource" "cni_network" {
   }
 
   provisioner "file" {
-    source      = "cni-network-kube-config.sh"
+    source      = "${path.module}/scripts/cni-network-kube-config.sh"
     destination = "/tmp/cni-network-kube-config.sh"
   }
 
   provisioner "file" {                              
-    source      = "loopback-network-config.sh"      
+    source      = "${path.module}/scripts/loopback-network-config.sh"      
     destination = "/tmp/loopback-network-config.sh" 
   }                                                   
 
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /tmp/cni-network-kube-config.sh",
-      "bash /tmp/cni-network-kube-config.sh",
-      "chmod +x /tmp/loopback-network-config.sh",
-      "bash /tmp/loopback-network-config.sh",
+      "sudo chmod +x /tmp/cni-network-kube-config.sh",
+      "sudo bash /tmp/cni-network-kube-config.sh",
+      "sudo chmod +x /tmp/loopback-network-config.sh",
+      "sudo bash /tmp/loopback-network-config.sh",
       "sudo mkdir -p /etc/containerd/",
     ]
   }
@@ -86,13 +87,15 @@ resource "null_resource" "cni_network" {
 ###############################
 
 data "template_file" "containerd_toml_template" {
-  template = "${file("${path.module}/containerd.tpl")}"
+  template = "${file("${path.module}/configs/containerd.tpl")}"
   count = "${var.count}"
+  depends_on = ["null_resource.cni_network"]
   #count = "${length(var.internal_master_private_ips)}"
 }
 
 resource "local_file" "containerd_toml_file" {
   count = "${var.count}"
+   depends_on = ["data.template_file.containerd_toml_template"]
   content  = "${data.template_file.containerd_toml_template.*.rendered[count.index]}"
   filename = "./worker-configs/${element(var.worker_node_names, count.index)}-config.toml"
 }
@@ -132,13 +135,15 @@ resource "null_resource" "containerd_config" {
 
 
 data "template_file" "containerd_service_template" {
-  template = "${file("${path.module}/containerd-service.tpl")}"
+  template = "${file("${path.module}/configs/containerd-service.tpl")}"
   count = "${var.count}"
+  depends_on = ["null_resource.containerd_config"]
   #count = "${length(var.internal_master_private_ips)}"
 }
 
 resource "local_file" "containerd_service_file" {
   count = "${var.count}"
+  depends_on = ["data.template_file.containerd_service_template"]
   content  = "${data.template_file.containerd_service_template.*.rendered[count.index]}"
   filename = "./worker-configs/${element(var.worker_node_names, count.index)}-containerd.service"
 }
@@ -178,7 +183,7 @@ resource "null_resource" "containerd_service_config" {
 
 resource "null_resource" "configure_kubelet_on_worker_nodes" {
   count = "${var.count}"
-
+  depends_on = ["null_resource.containerd_service_config"]
   connection {
     type         = "ssh"
     host = "${element(var.worker_dns_names,count.index)}"
@@ -203,12 +208,14 @@ resource "null_resource" "configure_kubelet_on_worker_nodes" {
 ################################                          
                                                                                            
 data "template_file" "kubelet_config_template" {                                          
-  template = "${file("${path.module}/kubelet-config.tpl")}"                                    
-  count = "${var.count}"                                                                                                       
+  template = "${file("${path.module}/configs/kubelet-config.tpl")}"                                    
+  count = "${var.count}"       
+  depends_on = ["null_resource.configure_kubelet_on_worker_nodes"]                                                                                                
 }                                                                                          
                                                                                            
 resource "local_file" "kubelet_config_local_file" {                                             
-  count = "${var.count}"                                                                   
+  count = "${var.count}"       
+  depends_on = ["data.template_file.kubelet_config_template"]                                                            
   content  = "${data.template_file.kubelet_config_template.*.rendered[count.index]}"      
   filename = "./worker-kubelet-configs/${element(var.worker_node_names, count.index)}-kubelet-config.yaml" 
 }                                                                       
@@ -248,12 +255,14 @@ resource "null_resource" "kubelet_config" {
 ###########################################################
 
 data "template_file" "kubelet_service_template" {
-  template = "${file("${path.module}/kubelet-service.tpl")}"
+  template = "${file("${path.module}/configs/kubelet-service.tpl")}"
   count = "${var.count}"
+  depends_on = ["null_resource.kubelet_config"]
 }
 
 resource "local_file" "kubelet_service_local_file" {
   count = "${var.count}"
+  depends_on = ["data.template_file.kubelet_service_template"]
   content  = "${data.template_file.kubelet_service_template.*.rendered[count.index]}"
   filename = "./worker-kubelet-configs/${element(var.worker_node_names, count.index)}-kubelet.service"
 }
@@ -292,7 +301,7 @@ resource "null_resource" "kubelet_service_config" {
 
 resource "null_resource" "configure_kubeproxy_on_worker_nodes" {               
   count = "${var.count}"                                                     
-                                                                             
+  depends_on = ["null_resource.kubelet_service_config"]                                                                             
   connection {                                                               
     type         = "ssh"                                                     
     host = "${element(var.worker_dns_names,count.index)}"                    
@@ -315,12 +324,14 @@ resource "null_resource" "configure_kubeproxy_on_worker_nodes" {
 ################################
 
 data "template_file" "kubeproxy_config_template" {
-  template = "${file("${path.module}/kube-proxy-config.tpl")}"
+  template = "${file("${path.module}/configs/kube-proxy-config.tpl")}"
   count = "${var.count}"
+  depends_on = ["null_resource.configure_kubeproxy_on_worker_nodes"]
 }
 
 resource "local_file" "kubeproxy_config_local_file" {
   count = "${var.count}"
+  depends_on = ["data.template_file.kubeproxy_config_template"]
   content  = "${data.template_file.kubeproxy_config_template.*.rendered[count.index]}"
   filename = "./worker-kube-proxy-configs/${element(var.worker_node_names, count.index)}-kube-proxy-config.yaml"
 }
@@ -357,12 +368,14 @@ resource "null_resource" "kubeproxy_config" {
 # Configure the kube-proxy service
 #################################################################
 data "template_file" "kubeproxy_service_template" {
-  template = "${file("${path.module}/kube-proxy-service.tpl")}"
+  template = "${file("${path.module}/configs/kube-proxy-service.tpl")}"
   count = "${var.count}"
+  depends_on = ["null_resource.kubeproxy_config"]
 }
 
 resource "local_file" "kubeproxy_service_local_file" {
   count = "${var.count}"
+  depends_on = ["data.template_file.kubeproxy_service_template"]
   content  = "${data.template_file.kubeproxy_service_template.*.rendered[count.index]}"
   filename = "./worker-kube-proxy-configs/${element(var.worker_node_names, count.index)}-kube-proxy.service"
 }
@@ -400,6 +413,7 @@ resource "null_resource" "kubeproxy_service_config" {
 
 resource "null_resource" "start_worker_services" {
   count  = "${var.count}"
+  depends_on = ["null_resource.kubeproxy_service_config"]
   connection {
     type         = "ssh"
     host = "${element(var.worker_dns_names,count.index)}"
@@ -419,4 +433,7 @@ resource "null_resource" "start_worker_services" {
   }
 }
 
-################################################################################                   
+################################################################################                
+
+
+   

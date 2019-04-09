@@ -1,4 +1,8 @@
-/*output "kubelet_crt_files" {
+/*output "route_table_id" {
+  value = "${azurerm_route_table.test.id}"
+}
+
+output "kubelet_crt_files" {
   value = "${local_file.kubelet_crt.*.filename}"
 }
 

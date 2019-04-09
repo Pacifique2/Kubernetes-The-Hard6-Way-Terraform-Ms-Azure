@@ -1,3 +1,5 @@
+variable "pods_route_table_id" {}
+
 variable "rs_location" {
   description = "The Azure location where the Resource Group should be located"
   default = "West Europe"

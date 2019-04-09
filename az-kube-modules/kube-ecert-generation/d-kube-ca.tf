@@ -29,11 +29,13 @@ resource "tls_self_signed_cert" "devo_kube_ca" {
 }
 
 resource "local_file" "devo_kube_ca_key" {
+  depends_on  = ["tls_private_key.devo_kube_ca"] 
   content  = "${tls_private_key.devo_kube_ca.private_key_pem}"
   filename = "./tls-certs/client-server/ca-key.pem"
 }
 
 resource "local_file" "devo_kube_ca_crt" {
+  depends_on  = ["tls_self_signed_cert.devo_kube_ca"]
   content  = "${tls_self_signed_cert.devo_kube_ca.cert_pem}"
   filename = "./tls-certs/client-server/ca.pem"
 }
@@ -41,7 +43,7 @@ resource "local_file" "devo_kube_ca_crt" {
 resource "null_resource" "devo_ca_certs" {
   count = "${var.nodes_count}"
   #"${length(var.node_dns_names)}"
-  
+  depends_on =  ["local_file.devo_kube_ca_crt","local_file.devo_kube_ca_key"]
   connection {
     type         = "ssh"
     host = "${element(var.node_dns_names,count.index)}"
@@ -104,11 +106,13 @@ resource "tls_locally_signed_cert" "devo_kube_admin" {
 }
 
 resource "local_file" "kube_admin_key" {
+  depends_on = ["tls_private_key.devo_kube_admin"]
   content  = "${tls_private_key.devo_kube_admin.private_key_pem}"
   filename = "./tls-certs/client-server/admin-key.pem"
 }
 
 resource "local_file" "kube_admin_crt" {
+  depends_on = ["tls_locally_signed_cert.devo_kube_admin"]
   content  = "${tls_locally_signed_cert.devo_kube_admin.cert_pem}"
   filename = "./tls-certs/client-server/admin.pem"
 }
@@ -168,14 +172,14 @@ resource "tls_locally_signed_cert" "kubelet_worker_ca" {
 
 resource "local_file" "kubelet_worker_key" {
   count = "${length(var.kube_worker_node_names)}"
-
+  depends_on = ["tls_private_key.kubelet_worker_prkey"]
   content  = "${tls_private_key.kubelet_worker_prkey.*.private_key_pem[count.index]}"
   filename = "./tls-certs/kubelet/${element(var.kube_worker_node_names, count.index)}-key.pem"
 }
 
 resource "local_file" "kubelet_crt" {
   count = "${length(var.kube_worker_node_names)}"
-
+  depends_on = ["tls_locally_signed_cert.kubelet_worker_ca"]
   content  = "${tls_locally_signed_cert.kubelet_worker_ca.*.cert_pem[count.index]}"
   filename = "./tls-certs/kubelet/${element(var.kube_worker_node_names, count.index)}.pem"
 }
@@ -183,8 +187,7 @@ resource "local_file" "kubelet_crt" {
 resource "null_resource" "kubelet_certs" {
   count = "${length(var.kube_worker_node_names)}"
 
-  depends_on = ["local_file.kubelet_crt"]
-  depends_on = ["local_file.kubelet_worker_key"]
+  depends_on = ["local_file.kubelet_crt","local_file.kubelet_worker_key"]
   
   connection {
     type         = "ssh"
@@ -210,7 +213,7 @@ resource "null_resource" "kubelet_certs" {
 resource "null_resource" "worker_ca_cert" {
   count = "${length(var.kube_worker_node_names)}"
 
-  depends_on = ["local_file.devo_kube_ca_crt"]
+  depends_on = ["local_file.devo_kube_ca_crt","local_file.devo_kube_ca_key"]
   connection {                                             
     type         = "ssh"                                   
     host = "${element(var.worker_nodes_dns_names,count.index)}"    
@@ -270,11 +273,13 @@ resource "tls_locally_signed_cert" "kube_controller_manager" {
 }
 
 resource "local_file" "kube_controller_manager_key" {
+  depends_on = ["tls_private_key.kube_controller_manager"]
   content  = "${tls_private_key.kube_controller_manager.private_key_pem}"
   filename = "./tls-certs/controller-manager/kube-controller-manager-key.pem"
 }
 
 resource "local_file" "kube_controller_manager_crt" {
+  depends_on = ["tls_locally_signed_cert.kube_controller_manager"]
   content  = "${tls_locally_signed_cert.kube_controller_manager.cert_pem}"
   filename = "./tls-certs/controller-manager/kube-controller-manager.pem"
 }
@@ -321,11 +326,13 @@ resource "tls_locally_signed_cert" "kube_proxy" {
 }
 
 resource "local_file" "kube_proxy_key" {
+  depends_on = ["tls_private_key.kube_proxy"]
   content  = "${tls_private_key.kube_proxy.private_key_pem}"
   filename = "./tls-certs/kube-proxy/kube-proxy-key.pem"
 }
 
 resource "local_file" "kube_proxy_crt" {
+  depends_on = ["tls_locally_signed_cert.kube_proxy"]
   content  = "${tls_locally_signed_cert.kube_proxy.cert_pem}"
   filename = "./tls-certs/kube-proxy/kube-proxy.pem"
 }
@@ -372,11 +379,13 @@ resource "tls_locally_signed_cert" "kube_scheduler" {
 }
 
 resource "local_file" "kube_scheduler_key" {
+  depends_on = ["tls_private_key.kube_scheduler"]
   content  = "${tls_private_key.kube_scheduler.private_key_pem}"
   filename = "./tls-certs/kube-scheduler/kube-scheduler-key.pem"
 }
 
 resource "local_file" "kube_scheduler_crt" {
+  depends_on = ["tls_locally_signed_cert.kube_scheduler"]
   content  = "${tls_locally_signed_cert.kube_scheduler.cert_pem}"
   filename = "./tls-certs/kube-scheduler/kube-scheduler.pem"
 }
@@ -434,11 +443,13 @@ resource "tls_locally_signed_cert" "kubernetes" {
 }
 
 resource "local_file" "kubernetes_key" {
+  depends_on = ["tls_private_key.kubernetes"]
   content  = "${tls_private_key.kubernetes.private_key_pem}"
   filename = "./tls-certs/kubernetes-key.pem"
 }
 
 resource "local_file" "kubernetes_crt" {
+  depends_on = ["tls_locally_signed_cert.kubernetes"]
   content  = "${tls_locally_signed_cert.kubernetes.cert_pem}"
   filename = "./tls-certs/kubernetes.pem"
 }
@@ -446,8 +457,7 @@ resource "local_file" "kubernetes_crt" {
 resource "null_resource" "kubernetes_certs" {
   count = "${var.nodes_count}"
   # "${length(var.master_nodes_dns_names)}"
-  depends_on = ["local_file.kubernetes_crt"]
-  depends_on = ["local_file.kubernetes_key"]
+  depends_on = ["local_file.kubernetes_crt","local_file.kubernetes_key"]
 
   connection {                                                   
     type         = "ssh"                                         
@@ -523,19 +533,20 @@ resource "tls_locally_signed_cert" "service-account" {
 }
 
 resource "local_file" "service-account_key" {
+  depends_on = ["tls_private_key.service-account"]
   content  = "${tls_private_key.service-account.private_key_pem}"
   filename = "./tls-certs/service-account/service-account-key.pem"
 }
 
 resource "local_file" "service-account_crt" {
+  depends_on = ["tls_locally_signed_cert.service-account"]
   content  = "${tls_locally_signed_cert.service-account.cert_pem}"
   filename = "./tls-certs/service-account/service-account.pem"
 }
 
 resource "null_resource" "service-account_certs" {
   count = "${var.nodes_count}"
-  depends_on = ["local_file.service-account_crt"]
-  depends_on = ["local_file.service-account_key"]
+  depends_on = ["local_file.service-account_crt","local_file.service-account_key"]
 
   connection {                                                   
     type         = "ssh"                                         
@@ -556,3 +567,5 @@ resource "null_resource" "service-account_certs" {
     destination = "~/service-account-key.pem"
   }
 }
+
+##########################################

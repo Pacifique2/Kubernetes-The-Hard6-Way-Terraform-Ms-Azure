@@ -43,6 +43,7 @@ resource "azurerm_subnet" "kube_vnet_subnet" {
   virtual_network_name = "${azurerm_virtual_network.kube_az_vnet.name}"
   address_prefix       = "${var.az_vnet_address_prefix[0]}"
   network_security_group_id = "${azurerm_network_security_group.kube_sg.id}"
+  route_table_id       = "${var.pods_route_table_id}"
 }
 
 resource "azurerm_subnet_network_security_group_association" "sg_association" {
@@ -86,3 +87,31 @@ resource "azurerm_network_security_rule" "inbound_https_traffic" {
   network_security_group_name = "${azurerm_network_security_group.kube_sg.name}"
 }
 
+resource "azurerm_network_security_rule" "inbound_allow_all" {
+  name                        = "kube-allow-all_inbound"
+  priority                    = 102
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "10.240.0.0/24"
+  destination_address_prefix  = "*"
+  resource_group_name         = "${azurerm_resource_group.terraform_test.name}"
+  network_security_group_name = "${azurerm_network_security_group.kube_sg.name}"
+}
+
+
+resource "azurerm_network_security_rule" "outbound_allow_all" {                   
+  name                        = "kube-allow-all_outbound"                                 
+  priority                    = 103                                              
+  direction                   = "Outbound"                                        
+  access                      = "Allow"                                          
+  protocol                    = "*"                                             
+  source_port_range           = "*"                                              
+  destination_port_range      = "*"                                              
+  source_address_prefix       = "*"                                  
+  destination_address_prefix  = "*"                                              
+  resource_group_name         = "${azurerm_resource_group.terraform_test.name}"  
+  network_security_group_name = "${azurerm_network_security_group.kube_sg.name}" 
+}                                                                                

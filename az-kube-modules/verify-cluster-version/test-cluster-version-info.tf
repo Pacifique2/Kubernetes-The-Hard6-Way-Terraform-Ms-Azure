@@ -8,6 +8,7 @@ resource "local_file" "kube_public_ip_file" {
 }*/
 
 resource "null_resource" "kube_api_server_version_test" {  
+  depends_on = ["null_resource.cluster_role_binding"]
   #KUBERNETES_PUBLIC_IP_ADDRESS = "${var.kube_public_ip}"                      
   /*                                                          
   connection {                                               
@@ -20,7 +21,7 @@ resource "null_resource" "kube_api_server_version_test" {
     agent        = true                                      
   }
      
-  depends_on = ["local_file.kube_public_ip_file"]
+  depends_on = ["null_resource.cluster_role_binding","local_file.kube_public_ip_file"]
   provisioner "file" {
     source   = "./kube-verify-api-server/KUBERNETES_PUBLIC_IP_ADDRESS"
     destination =  "~/KUBERNETES_PUBLIC_IP"
@@ -39,8 +40,11 @@ resource "null_resource" "kube_api_server_version_test" {
   }                                                       
    */                                                          
   provisioner "local-exec" {                                
-    command = "echo 'verify the cluster version info'",                  
+    command = "echo 'verify the cluster version info'"
+    command = "echo 'Start checking the api server health .....................'"                
     command = "curl --cacert tls-certs/client-server/ca.pem https://$KUBERNETES_PUBLIC_IP_ADDRESS:6443/version"
+    command = "echo 'Okk!!! finished testing the api server health check'" 
+    command =  "echo done"
                                            
     environment = {
       KUBERNETES_PUBLIC_IP_ADDRESS = "${var.kubernetes_public_ip_address}"

@@ -9,6 +9,7 @@
 resource "null_resource" "kube_control_binaries" {
   #count = "${length(var.controller_dns_names)}"
   count  = "${var.count}"
+  depends_on = ["null_resource.etcd_server_test"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,count.index)}"
@@ -38,6 +39,7 @@ resource "null_resource" "kube_control_binaries" {
 resource "null_resource" "kube_api_server_config" {
   #count = "${length(var.controller_dns_names)}"
   count  = "${var.count}"
+  depends_on = ["null_resource.kube_control_binaries"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,count.index)}"
@@ -102,6 +104,7 @@ RestartSec=5
 WantedBy=multi-user.target
   EOT
   count = "${var.count}"
+  depends_on = ["null_resource.kube_api_server_config"]
   # count = "${length(var.internal_master_private_ips)}"
   vars {
     INTERNAL_IP = "${element(var.internal_master_private_ips, count.index)}"
@@ -117,6 +120,7 @@ WantedBy=multi-user.target
 resource "local_file" "api_server_service_config" {
   # count    = "${length(var.internal_master_private_ips)}"
   count  = "${var.count}"
+  depends_on = ["data.template_file.kube_api_server_service_template"]
   content  = "${data.template_file.kube_api_server_service_template.*.rendered[count.index]}"
   filename = "./configs-api-server-service/${element(var.controller_node_names, count.index)}.kube-apiserver.service"
 }
@@ -160,6 +164,7 @@ resource "null_resource" "kube_apiserver" {
 resource "null_resource" "move_kube_contoller_manager_config" {
   #count = "${length(var.controller_dns_names)}"
   count  = "${var.count}"
+  depends_on = ["null_resource.kube_apiserver"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,count.index)}"
@@ -206,6 +211,7 @@ RestartSec=5
 WantedBy=multi-user.target
   EOT
   count = "${var.count}"
+  depends_on = ["null_resource.move_kube_contoller_manager_config"]
   /*vars {
     INTERNAL_IP = "${element(var.internal_master_private_ips, count.index)}"
     COUNT       =  "${length(var.controller_node_names)}"
@@ -218,6 +224,7 @@ WantedBy=multi-user.target
 
 resource "local_file" "kube_controller_manager_service_config" {
   count  = "${var.count}"
+  depends_on = ["data.template_file.kube_controller_manager_service_template"]
   content  = "${data.template_file.kube_controller_manager_service_template.*.rendered[count.index]}"
   filename = "./configs-controller-manager-service/kube-controller-manager.service"
 }
@@ -259,7 +266,7 @@ resource "null_resource" "kube_api_server" {
 resource "null_resource" "move_kube_scheduler_config" {
   #count = "${length(var.controller_dns_names)}"
   count  = "${var.count}"
-
+  depends_on = ["null_resource.kube_api_server"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,count.index)}"
@@ -287,11 +294,13 @@ data "template_file" "kube_scheduler_yaml_template" {
      leaderElect: true
   EOT
   count = "${var.count}"
+  depends_on = ["null_resource.move_kube_scheduler_config"]
   #count = "${length(var.internal_master_private_ips)}"
 }
 
 resource "local_file" "kube_scheduler_yaml_config" {
   count = "${var.count}"
+  depends_on = ["data.template_file.kube_scheduler_yaml_template"]
   content  = "${data.template_file.kube_scheduler_yaml_template.*.rendered[count.index]}"
   filename = "./configs-kube-scheduler/${element(var.controller_node_names, count.index)}-kube-scheduler.yaml"
 }
@@ -346,10 +355,12 @@ RestartSec=5
 WantedBy=multi-user.target
   EOT
   count = "${var.count}"
+  depends_on = ["null_resource.kube_scheduler_config"]
 }
 
 resource "local_file" "kube_scheduler_service" {
   count = "${var.count}"
+  depends_on = ["data.template_file.kube_scheduler_service_template"]
   content  = "${data.template_file.kube_scheduler_service_template.*.rendered[count.index]}"
   filename = "./configs-kube-scheduler/${element(var.controller_node_names, count.index)}-kube-scheduler.service"
 }
@@ -389,6 +400,7 @@ resource "null_resource" "kube_scheduler_service" {
 resource "null_resource" "start_controller_services" {
   #count = "${length(var.controller_dns_names)}"
   count  = "${var.count}"
+  depends_on = ["null_resource.kube_scheduler_service"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,count.index)}"
@@ -452,10 +464,12 @@ server {
 }
   EOT
   count = "${var.count}"
+  depends_on = ["null_resource.nginx_install"]
 }
 
 resource "local_file" "kube_default_service_local_file" {
   count = "${var.count}"
+  depends_on = ["data.template_file.kube_default_service_local_template"]
   content  = "${data.template_file.kube_default_service_local_template.*.rendered[count.index]}"
   filename = "./kube-health-check/${element(var.controller_node_names, count.index)}-kubernetes.default.svc.cluster.local"
 }
@@ -508,7 +522,7 @@ resource "null_resource" "kube_health__check_service" {
 
 resource "null_resource" "cluster_role" {
   # count = "${length(var.controller_node_names)}"
-
+  depends_on = ["null_resource.kube_health__check_service"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,0)}"
@@ -541,9 +555,9 @@ resource "null_resource" "cluster_role" {
 
 # Bind the system:kube-apiserver-to-kubelet ClusterRole to the kubernetes user:
 
-resource "null_resource" "cluster_role_bindingg" {
+resource "null_resource" "cluster_role_binding" {
   #count = "${length(var.controller_node_names)}"
-
+  depends_on = ["null_resource.cluster_role"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,0)}"

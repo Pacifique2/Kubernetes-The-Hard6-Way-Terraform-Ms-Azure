@@ -132,9 +132,7 @@ resource "azurerm_virtual_machine" "main" {
       key_data = "${var.ssh_key_data}"
     } 
   }
-  tags = {
-    environment = "Terraform Demo"
-  }
+  tags = "${var.kube_az_tags}"
   
   connection {
     type         = "ssh"

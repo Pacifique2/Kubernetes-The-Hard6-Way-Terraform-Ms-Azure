@@ -1,6 +1,11 @@
 resource "null_resource" "etcd_certs" {
   #count = "${length(var.controller_dns_names)}"
   count  = "${var.count}"
+  depends_on = [
+          "data.template_file.kubelet_config_template","null_resource.kubelet_provisioner","null_resource.kube-proxy-provisioner",
+          "null_resource.kube-controller-manager-provisioner", "null_resource.kube-scheduler-provisioner","null_resource.admin-provisioner",
+          "null_resource.encryption_config-provisioner"
+  ]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,count.index)}"
@@ -25,6 +30,7 @@ resource "null_resource" "etcd_certs" {
 resource "null_resource" "etcd_binary" {
   #count = "${length(var.controller_dns_names)}"
   count  = "${var.count}"
+  depends_on ["null_resource.etcd_certs"]
   connection {                                            
     type         = "ssh"                                  
     host = "${element(var.controller_dns_names,count.index)}"   
@@ -45,6 +51,7 @@ resource "null_resource" "etcd_binary" {
 }
 
 data "template_file" "etcd_service_template" {
+  
   template =<<EOT
 [Unit]
 Description=etcd
@@ -75,7 +82,8 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
   EOT
-   
+  depends_on = ["null_resource.etcd_certs","null_resource.etcd_binary"]
+  #depends_on = ["aws_elb.kubernetes-elb","","aws_instance.kubernetes_controllers","aws_instance.kubernetes_workers"] 
   count = "${var.count}"
   #count = "${length(var.controller_dns_names)}"
   #internal_master_private_ips
@@ -93,6 +101,7 @@ WantedBy=multi-user.target
 resource "local_file" "etcd_config" {
   #count    = "${length(var.internal_master_private_ips)}"
   count  = "${var.count}"
+  depends_on = ["data.template_file.etcd_service_template"]
   content  = "${data.template_file.etcd_service_template.*.rendered[count.index]}"
   filename = "./configs-etcd/${element(var.controller_node_names, count.index)}.etcd.service"
 }
@@ -101,7 +110,7 @@ resource "local_file" "etcd_config" {
 resource "null_resource" "etcd_server" {
   #count = "${length(var.controller_node_names)}"
   count  = "${var.count}"
-  # depends_on = ["local_file.etcd_config"]
+  depends_on = ["local_file.etcd_config","null_resource.etcd_certs"]
   connection {                                            
     type         = "ssh"                                  
     host = "${element(var.controller_dns_names,count.index)}"   
@@ -112,7 +121,7 @@ resource "null_resource" "etcd_server" {
     agent        = true                                   
   }                                                       
 
-  depends_on = ["local_file.etcd_config"]
+  # depends_on = ["local_file.etcd_config"]
 
   provisioner "file" {
     source      = "./configs-etcd/${element(var.controller_node_names, count.index)}.etcd.service"
@@ -133,15 +142,15 @@ resource "null_resource" "etcd_server" {
      
     ]
      */
-    # script = "${path.module}/etcd-script.sh"
+    #script = "${path.module}/etcd-script.sh"
   }
 }
-/*
-# Configure the etcd server
+
+# test the etcd server
 resource "null_resource" "etcd_server_test" {
   #count = "${length(var.controller_node_names)}"
   count  = "${var.count}"
-  # depends_on = ["local_file.etcd_config"]
+  depends_on = ["null_resource.etcd_server","local_file.etcd_config"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,count.index)}"
@@ -159,4 +168,4 @@ resource "null_resource" "etcd_server_test" {
   }
 
 }
-*/
+

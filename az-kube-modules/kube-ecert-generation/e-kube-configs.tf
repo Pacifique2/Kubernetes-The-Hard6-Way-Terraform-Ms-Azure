@@ -21,10 +21,14 @@ data "template_file" "kubelet_config_template" {
         client-certificate-data: $${client-certificate-data}
         client-key-data: $${client-key-data}
   EOT
+  depends_on = [
+          "null_resource.devo_ca_certs","null_resource.kubelet_certs","null_resource.worker_ca_cert","null_resource.kubernetes_certs",
+           "null_resource.service-account_certs",
+  ]
   count = "${var.nodes_count}"
 
   vars {
-    certificate-authority-data = "${tls_self_signed_cert.devo_kube_ca.cert_pem}"
+    certificate-authority-data = "${base64encode(tls_self_signed_cert.devo_kube_ca.cert_pem)}"
     # "${base64encode(var.kube_ca_crt_pem)}"
     client-key-data            = "${base64encode(tls_private_key.kubelet_worker_prkey.*.private_key_pem[count.index])}"
     # "element(var.kubelet_crt_pems, count.index)"
@@ -37,6 +41,7 @@ data "template_file" "kubelet_config_template" {
 
 resource "local_file" "kubelet_config" {
   count    = "${length(var.kube_worker_node_names)}"
+  depends_on = ["data.template_file.kubelet_config_template"]
   content  = "${data.template_file.kubelet_config_template.*.rendered[count.index]}"
   filename = "./configs/${element(var.kube_worker_node_names, count.index)}.kubeconfig"
 }
@@ -89,7 +94,10 @@ data "template_file" "kube-proxy_config_template" {
         client-certificate-data: $${client-certificate-data}
         client-key-data: $${client-key-data}
   EOT
-
+  depends_on = [
+          "null_resource.devo_ca_certs","null_resource.kubelet_certs","null_resource.worker_ca_cert","null_resource.kubernetes_certs",
+           "null_resource.service-account_certs",
+  ]
   vars {
     certificate-authority-data = "${base64encode(tls_self_signed_cert.devo_kube_ca.cert_pem)}"
     client-certificate-data    = "${base64encode(tls_locally_signed_cert.kube_proxy.cert_pem)}"
@@ -99,6 +107,7 @@ data "template_file" "kube-proxy_config_template" {
 }
 
 resource "local_file" "kube-proxy_config" {
+  depends_on = ["data.template_file.kube-proxy_config_template"]
   content  = "${data.template_file.kube-proxy_config_template.rendered}"
   filename = "./configs/kube-proxy.kubeconfig"
 }
@@ -152,7 +161,10 @@ data "template_file" "kube-controller-manager_config_template" {
         client-certificate-data: $${client-certificate-data}
         client-key-data: $${client-key-data}
   EOT
-
+  depends_on = [
+          "null_resource.devo_ca_certs","null_resource.kubelet_certs","null_resource.worker_ca_cert","null_resource.kubernetes_certs",
+           "null_resource.service-account_certs",
+  ]
   vars {
     certificate-authority-data = "${base64encode(tls_self_signed_cert.devo_kube_ca.cert_pem)}"
     client-certificate-data    = "${base64encode(tls_locally_signed_cert.kube_controller_manager.cert_pem)}"
@@ -161,6 +173,7 @@ data "template_file" "kube-controller-manager_config_template" {
 }
 
 resource "local_file" "kube-controller-manager_config" {
+  depends_on = ["data.template_file.kube-controller-manager_config_template"]
   content  = "${data.template_file.kube-controller-manager_config_template.rendered}"
   filename = "./configs-controllers/kube-controller-manager.kubeconfig"
 }
@@ -214,7 +227,10 @@ data "template_file" "kube-scheduler_config_template" {
         client-certificate-data: $${client-certificate-data}
         client-key-data: $${client-key-data}
   EOT
-
+  depends_on = [
+          "null_resource.devo_ca_certs","null_resource.kubelet_certs","null_resource.worker_ca_cert","null_resource.kubernetes_certs",
+           "null_resource.service-account_certs",
+  ]
   vars {
     certificate-authority-data = "${base64encode(tls_self_signed_cert.devo_kube_ca.cert_pem)}"
     client-certificate-data    = "${base64encode(tls_locally_signed_cert.kube_scheduler.cert_pem)}"
@@ -223,6 +239,7 @@ data "template_file" "kube-scheduler_config_template" {
 }
 
 resource "local_file" "kube-scheduler-config" {
+  depends_on = ["data.template_file.kube-scheduler_config_template"]
   content  = "${data.template_file.kube-scheduler_config_template.rendered}"
   filename = "./configs-controllers/kube-scheduler.kubeconfig"
 }
@@ -275,7 +292,10 @@ data "template_file" "admin_config_template" {
         client-certificate-data: $${client-certificate-data}
         client-key-data: $${client-key-data}
   EOT
-
+  depends_on = [
+          "null_resource.devo_ca_certs","null_resource.kubelet_certs","null_resource.worker_ca_cert","null_resource.kubernetes_certs",
+           "null_resource.service-account_certs",
+  ]
   vars {
     certificate-authority-data = "${base64encode(tls_self_signed_cert.devo_kube_ca.cert_pem)}"
     client-certificate-data    = "${base64encode(tls_locally_signed_cert.devo_kube_admin.cert_pem)}"
@@ -284,6 +304,7 @@ data "template_file" "admin_config_template" {
 }
 
 resource "local_file" "admin_config" {
+  depends_on = ["data.template_file.admin_config_template"]
   content  = "${data.template_file.admin_config_template.rendered}"
   filename = "./configs-adminUser/admin.kubeconfig"
 }
@@ -331,13 +352,17 @@ data "template_file" "encryption_config_template" {
                   secret: $${kube_data_encryption_key}
           - identity: {}
   EOT
-
+  depends_on = [
+          "null_resource.devo_ca_certs","null_resource.kubelet_certs","null_resource.worker_ca_cert","null_resource.kubernetes_certs",
+           "null_resource.service-account_certs","random_string.kube_data_encryption_key",
+  ]
   vars {
     kube_data_encryption_key = "${base64encode(random_string.kube_data_encryption_key.result)}"
   }
 }
 
 resource "local_file" "data_encryption_config" {
+  depends_on = ["data.template_file.encryption_config_template"]
   content  = "${data.template_file.encryption_config_template.rendered}"
   filename = "./configs-data-encryption/encryption-config.yaml"
 }

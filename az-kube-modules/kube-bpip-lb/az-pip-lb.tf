@@ -19,7 +19,7 @@ resource "azurerm_lb" "kube_lb" {
   resource_group_name = "${var.rs_name}"
 
   frontend_ip_configuration {
-    name                 = "KubePublicIPAddress"
+    name                 = "${var.frontend_ip_configuration_name}"
     public_ip_address_id = "${azurerm_public_ip.kube_pip.id}"
   }
 }

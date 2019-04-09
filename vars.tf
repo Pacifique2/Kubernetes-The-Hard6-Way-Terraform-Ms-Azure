@@ -8,5 +8,6 @@ variable "controller_username" {}
 variable "controller_password" {}
 variable "w_password" {} 
 variable "w_username" {}
+variable "lb_frontend_ip_conf_name" {}
 #variable "ssh_public_key" {}
-
+variable "deny_bgp_route_propagation" {}
