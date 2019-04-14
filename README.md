@@ -46,7 +46,7 @@ This module created the kubernetes the load balancer rules within MS azure cloud
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-lb-rules*
  
  ### az-modules/kube-cnodes
-This module created a set of linux virtual machines that would be used while boostrapping the kubernetes control plane within MS azure cloud platform.
+This module created a set of linux virtual machines that would be used while boostrapping the kubernetes control plane within MS azure cloud platform.\\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-cnodes*
  
  ### az-modules/kube-dworker-nodes
@@ -54,9 +54,9 @@ This module created a set of linux virtual machines that would be used as kubern
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-dworker-nodes*
  
  ### az-modules/kube-ecert-generation
-This module creates not only the certificates and kubernetes configurations files, but also all the remaining necessary resources and deployments to have a fully set up kubernetes cluster.
+This module creates not only the certificates and kubernetes configurations files, but also all the remaining necessary resources and deployments to have a fully set up kubernetes cluster.\\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/d-kube-ca.tf*
- All the remaing steps has their terraform files within the above module. The link is below:
+ All the remaing steps have their terraform files within the above module. The link is below:\\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-ecert-generation*
  
 ## Provisioning the CA and Generating TLS Certificates
