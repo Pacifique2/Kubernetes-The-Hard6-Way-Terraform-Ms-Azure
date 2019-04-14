@@ -61,5 +61,10 @@ From the project root directory, run :
  This will ensure that all the necessary environment plugins are downloaded for terraform to run the implementation
 ## Run terraform plan
 ## Then run terraform apply 
+By typing yes, terraform sets up the whole functionning  kubernetes cluster.
+## Testing Two external users and Understanding RBAC
+Now, the cluster has generated a kubernetes config file in your local machine.
+Type kubectl config view;
+You will find three configured remote users that have beeen granted different permissions to interact with our new kubernetes cluster hosted on MS Azure.
  
 
