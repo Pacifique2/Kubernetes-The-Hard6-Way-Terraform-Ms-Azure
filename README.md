@@ -12,14 +12,15 @@ In this project, we end up adding a special use case where we use the RBAC kuber
 
 Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
 
- ## Kubernetes 1.12.0  
+ ## Kubernetes 1.13.0  
  ### https://github.com/kubernetes/kubernetes
 
 ## containerd Container Runtime 1.2.0-rc.0
 ## gVisor 50c283b9f56bb7200938d9e207355f05f79f0d17
 ## CNI Container Networking 0.6.0
 ## etcd v3.3.9
-## CoreDNS v1.2.2
+## CoreDNS from docker image: coredns/coredns:1.2.2
+
 
 # Steps to bring up the kubernetes cluster
 
