@@ -40,8 +40,7 @@ We don't need to install go either
 ## Provisioning Pod Network Routes
 ## Deploying the DNS Cluster Add-on
 ## Adding two namespaces for two external users to use the set up kubernetes cluster
-  Here we add two users, one from a company called **Devoteam France and an other from my engineering school known as Telecom SudParis
-Testing the cluster.**
+  Here we add two users, one from a company called **Devoteam France and an other from an engineering school known as Telecom SudParis.**
 we use the kubernetes RBAC roles and rolesbindings to grant different permissions to these two users with respect to their namespaces.
 
 
@@ -49,28 +48,18 @@ we use the kubernetes RBAC roles and rolesbindings to grant different permission
 # Installation
 The following steps are required to setup and run this project:
 
-Clone the repo ## 
-Generate an SSH key which can be used to SSH to the Kubernetes vms instances which will be created within MS Azure public cloud. The generated public/private key pair should be generated in a folder matching the path(s) found in the respective variables ssh_key_data for path to public key and make sure that both the public key and private key can be located from the .ssh directory. This will ensure that the Terraform variables file can read them correctly. An example of generating such a public/private key pair can be found on internet.
+Clone the repo  **https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure.git**
+## SSH
+Generate an SSH key which can be used to SSH to the Kubernetes vms instances which will be created within MS Azure public cloud. The generated public/private key pair should be generated in a folder matching the path found in the ssh_key_data variable for path to public key and make sure that both the public key and private key can be located from the .ssh directory. This will ensure that the Terraform **vm** files can read them correctly. Ensure that the ssh agent is running from your local machine that you used to clone the repo.
 
 Ensure that the AZURE credentials profile that you wish to use to run this project is specified correctly in your Azure CLI authentication to Azure portal . Ensure that your subscription id is configured  int azure prvider file before testing. 
 
-Install Terraform.
-Install go.
-Install the following cfssl tools:
-go get -u github.com/cloudflare/cfssl/cmd/cfssl
-go get -u github.com/cloudflare/cfssl/cmd/cfssljson
-go get -u github.com/cloudflare/cfssl/cmd/mkbundle
-Install kubectl
+## Install Terraform 
+## Install kubectl
+From the project root directory, run :
+## run terraform init
+ This will ensure that all the necessary environment plugins are downloaded for terraform to run the implementation
+## Run terraform plan
+## Then run terraform apply 
+ 
 
-For now we initiate and apply twice fo a complete 
-From the terraform root directory execute the following to ensure that the expected resources will be created:
-comment out the certs module within main tarraform file
-terraform init to download the environment plugins
-terraform plan
-and then to actually create the required Azure resources:
-
-terraform apply
-
-
-From project root run:
-terraform init 
