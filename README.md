@@ -23,6 +23,10 @@ Kubernetes The Hard Way guides you through bootstrapping a highly available Kube
 
 # Steps to bring up the kubernetes cluster
 
+We would like to note that our kubernetes implementation is tructured into modules that are all found into the **az-modules directory**.
+Other modules other than the mentioned one, are for test purposes.
+The man terraform file of this project is named **az-provider.tf**.
+
 ## Prerequisites
 Despite the need to install PKI install from the original implementation of kuberntes the hard way, we wouldn't need to do so since we use terraform tls modules to automatically generate tls certifications.
 
@@ -30,6 +34,27 @@ We won't need to install the PKI tools such cfssl cfssljon as mentioned in the o
 We don't need to install go either
 
 ## Provisioning Compute Resources
+### az-modules/kube-avnet
+ This module creates the overall resource group with supporting infrastructure, such as VNET, Subnet
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-avnet*
+### az-modules/kube-bpip-lb
+This module created the kubernetes public ip and the load balancer within MS azure cloud platform.
+ *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-bpip-lb*
+ 
+ ### az-modules/kube-lb-rules
+This module created the kubernetes the load balancer rules within MS azure cloud platform.
+ *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-lb-rules*
+ 
+ ### az-modules/kube-cnodes
+This module created a set of linux virtual machines that would be used while boostrapping the kubernetes control plane within MS azure cloud platform.
+ *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-cnodes*
+ 
+ ### az-modules/kube-cnodes
+This module created a set of linux virtual machines that would be used as kubernetes worker nodes.
+ *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-dworker-nodes*
+ 
+ 
+ 
 ## Provisioning the CA and Generating TLS Certificates
 ## Generating Kubernetes Configuration Files for Authentication
 ## Generating the Data Encryption Config and Key
