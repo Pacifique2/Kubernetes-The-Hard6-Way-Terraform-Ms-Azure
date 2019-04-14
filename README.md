@@ -95,7 +95,12 @@ By typing yes, terraform sets up the whole functionning  kubernetes cluster.
 Now, the cluster has generated a kubernetes config file in your local machine.
 Type kubectl config view;
 You will find three configured remote users that have beeen granted different permissions to interact with our new kubernetes cluster hosted on MS Azure.
+The defined RBAC roles and roleBindings can be found at the link below: \
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/scripts/users-rolesRoleBings.sh*
+
 The first user is the **admin user** that have been granted permissions at the cluster-scope
 The other two remote users are first, a **devoteam-pacy user within the devoteam-apps namespace** and a **tsp-pacy user within telecom-sud-paris-apps kubernetes namespace** Each user has permissions to carry out applicaions deployments in the namespace to which he belongs. This means that devoteam-pacy user has no rights to deploy and view applications deployed within the telecom-sud-paris-apps kubernetes namespace and vice-versa.
+
+
  
 
