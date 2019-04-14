@@ -34,45 +34,55 @@ We won't need to install the PKI tools such cfssl cfssljon as mentioned in the o
 We don't need to install go either
 
 ## Provisioning Compute Resources
-### az-modules/kube-avnet
+### az-kube-modules/kube-avnet
  This module creates the overall resource group with supporting infrastructure, such as VNET, Subnet
 *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-avnet*
-### az-modules/kube-bpip-lb
+### az-kube-modules/kube-bpip-lb
 This module created the kubernetes public ip and the load balancer within MS azure cloud platform.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-bpip-lb*
  
- ### az-modules/kube-lb-rules
+ ### az-kube-modules/kube-lb-rules
 This module created the kubernetes the load balancer rules within MS azure cloud platform.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-lb-rules*
  
- ### az-modules/kube-cnodes
+ ### az-kube-modules/kube-cnodes
 This module created a set of linux virtual machines that would be used while boostrapping the kubernetes control plane within MS azure cloud platform.\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-cnodes*
  
- ### az-modules/kube-dworker-nodes
+ ### az-kube-modules/kube-dworker-nodes
 This module created a set of linux virtual machines that would be used as kubernetes worker nodes.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-dworker-nodes*
  
 ## Provisioning the CA and Generating TLS Certificates
 
- ### az-modules/kube-ecert-generation
+ ### az-kube-modules/kube-ecert-generation
  
 This module creates not only the certificates and kubernetes configurations files, but also all the remaining necessary resources and deployments to have a fully set up kubernetes cluster.\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/d-kube-ca.tf*. \
  All the remaing steps have their terraform files within the above module. The link is below:\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-ecert-generation*
  
-## Generating Kubernetes Configuration Files for Authentication
-## Generating the Data Encryption Config and Key
+## Generating both Kubernetes Configuration Files for Authentication and the Data Encryption Config and Key
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/e-kube-configs.tf*.
+
 ## Bootstrapping the etcd Cluster
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/f-kube-etcd.tf*.
 ## Bootstrapping the Kubernetes Control Plane
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/g-boostrap-kube-control-plane.tf*.
 ## Bootstrapping the Kubernetes Worker Nodes
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/h-bootstrapping-kube-worker-nodes.tf*.
 ## Configuring kubectl for Remote Access
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/kubectl-remote-setup.tf*.
+## Testing remote admin user with kubectl 
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/kubectl-remote-test.tf*.
 ## Provisioning Pod Network Routes
+### az-kube-modules/kube-pods-route-table
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-pods-route-table*.
 ## Deploying the DNS Cluster Add-on
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/pods-dns-set-up.tf*.
 ## Adding two namespaces for two external users to use the set up kubernetes cluster
   Here we add two users, one from a company called **Devoteam France and an other from an engineering school known as Telecom SudParis.**
-we use the kubernetes RBAC roles and rolesbindings to grant different permissions to these two users with respect to their namespaces.
+we use the kubernetes RBAC authorization to create roles and rolesbindings that grant different permissions to these two users with respect to their namespaces.
 
 
 
