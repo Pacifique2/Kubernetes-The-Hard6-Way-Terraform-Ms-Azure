@@ -82,7 +82,9 @@ This module creates not only the certificates and kubernetes configurations file
 *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/pods-dns-set-up.tf*.
 ## Adding two namespaces for two external users to use the set up kubernetes cluster
   Here we add two users, one from a company called **Devoteam France and an other from an engineering school known as Telecom SudParis.**
-we use the kubernetes RBAC authorization to create roles and rolesbindings that grant different permissions to these two users with respect to their namespaces.
+we use the kubernetes RBAC authorization to create roles and rolesbindings that grant different permissions to these two users with respect to their namespaces.\
+
+*https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/add-kube-users-with-permissions.tf*.
 
 
 
