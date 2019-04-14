@@ -6,42 +6,50 @@ Kubernetes The Hard Way is optimized for learning, which means taking the long r
 
 Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
 
-In this project, we generate both tls certificates and kubernetes configuration files differently from the previous kubernetes project. Using terraform to implement kubernetes the hard way.
+In this project, we end up adding a special use case where we use the RBAC kubernetes autorization mode to grant and limit user permissions with respect to their respective namespaces. We used  terraform to implement kubernetes the hard way.
 
-Cluster Details
+# Cluster Details
 
 Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
 
-Kubernetes 1.12.0
-https://github.com/kubernetes/kubernetes
+ ## Kubernetes 1.12.0  
+ ### https://github.com/kubernetes/kubernetes
 
-containerd Container Runtime 1.2.0-rc.0
-gVisor 50c283b9f56bb7200938d9e207355f05f79f0d17
-CNI Container Networking 0.6.0
-etcd v3.3.9
-CoreDNS v1.2.2
+## containerd Container Runtime 1.2.0-rc.0
+## gVisor 50c283b9f56bb7200938d9e207355f05f79f0d17
+## CNI Container Networking 0.6.0
+## etcd v3.3.9
+## CoreDNS v1.2.2
 
-Steps to bring up the kubernetes cluster
+# Steps to bring up the kubernetes cluster
 
-Prerequisites
-Install PKI tools such cfssl cfssljon 
-Installing the Client Tools
-Provisioning Compute Resources
-Provisioning the CA and Generating TLS Certificates
-Generating Kubernetes Configuration Files for Authentication
-Generating the Data Encryption Config and Key
-Bootstrapping the etcd Cluster
-Bootstrapping the Kubernetes Control Plane
-Bootstrapping the Kubernetes Worker Nodes
-Configuring kubectl for Remote Access
-Provisioning Pod Network Routes
-Deploying the DNS Cluster Add-on
-Testing the cluster
+## Prerequisites
+Despite the need to install PKI install from the original implementation of kuberntes the hard way, we wouldn't need to do so since we use terraform tls modules to automatically generate tls certifications.
 
-Installation
+We won't need to install the PKI tools such cfssl cfssljon as mentioned in the original kubernetes the hard way project.
+We don't need to install go either
+
+## Provisioning Compute Resources
+## Provisioning the CA and Generating TLS Certificates
+## Generating Kubernetes Configuration Files for Authentication
+## Generating the Data Encryption Config and Key
+## Bootstrapping the etcd Cluster
+## Bootstrapping the Kubernetes Control Plane
+## Bootstrapping the Kubernetes Worker Nodes
+## Configuring kubectl for Remote Access
+## Provisioning Pod Network Routes
+## Deploying the DNS Cluster Add-on
+## Adding two namespaces for two external users to use the set up kubernetes cluster
+  Here we add two users, one from a company called **Devoteam France and an other from my engineering school known as Telecom SudParis
+Testing the cluster.**
+we use the kubernetes RBAC roles and rolesbindings to grant different permissions to these two users with respect to their namespaces.
+
+
+
+# Installation
 The following steps are required to setup and run this project:
 
-Clone the repo
+Clone the repo ## 
 Generate an SSH key which can be used to SSH to the Kubernetes vms instances which will be created within MS Azure public cloud. The generated public/private key pair should be generated in a folder matching the path(s) found in the respective variables ssh_key_data for path to public key and make sure that both the public key and private key can be located from the .ssh directory. This will ensure that the Terraform variables file can read them correctly. An example of generating such a public/private key pair can be found on internet.
 
 Ensure that the AZURE credentials profile that you wish to use to run this project is specified correctly in your Azure CLI authentication to Azure portal . Ensure that your subscription id is configured  int azure prvider file before testing. 
