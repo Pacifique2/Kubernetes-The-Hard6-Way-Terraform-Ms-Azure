@@ -67,35 +67,35 @@ Description=Kubernetes API Server
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
-ExecStart=/usr/local/bin/kube-apiserver \\
-  --advertise-address=$${INTERNAL_IP} \\
-  --allow-privileged=true \\
-  --apiserver-count=$${COUNT} \\
-  --audit-log-maxage=30 \\
-  --audit-log-maxbackup=3 \\
-  --audit-log-maxsize=100 \\
-  --audit-log-path=/var/log/audit.log \\
-  --authorization-mode=Node,RBAC \\
-  --bind-address=0.0.0.0 \\
-  --client-ca-file=/var/lib/kubernetes/ca.pem \\
-  --enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \\
-  --enable-swagger-ui=true \\
-  --etcd-cafile=/var/lib/kubernetes/ca.pem \\
-  --etcd-certfile=/var/lib/kubernetes/kubernetes.pem \\
-  --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\
-  --etcd-servers=https://10.240.0.10:2379,https://10.240.0.11:2379,https://10.240.0.12:2379 \\
-  --event-ttl=1h \\
-  --experimental-encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
-  --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
-  --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \\
-  --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \\
-  --kubelet-https=true \\
-  --runtime-config=api/all \\
-  --service-account-key-file=/var/lib/kubernetes/service-account.pem \\
-  --service-cluster-ip-range=10.32.0.0/24 \\
-  --service-node-port-range=30000-32767 \\
-  --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \\
-  --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \\
+ExecStart=/usr/local/bin/kube-apiserver \
+  --advertise-address=$${INTERNAL_IP} \
+  --allow-privileged=true \
+  --apiserver-count=$${COUNT} \
+  --audit-log-maxage=30 \
+  --audit-log-maxbackup=3 \
+  --audit-log-maxsize=100 \
+  --audit-log-path=/var/log/audit.log \
+  --authorization-mode=Node,RBAC \
+  --bind-address=0.0.0.0 \
+  --client-ca-file=/var/lib/kubernetes/ca.pem \
+  --enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
+  --enable-swagger-ui=true \
+  --etcd-cafile=/var/lib/kubernetes/ca.pem \
+  --etcd-certfile=/var/lib/kubernetes/kubernetes.pem \
+  --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \
+  --etcd-servers=https://10.240.0.10:2379,https://10.240.0.11:2379,https://10.240.0.12:2379 \
+  --event-ttl=1h \
+  --experimental-encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \
+  --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \
+  --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \
+  --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \
+  --kubelet-https=true \
+  --runtime-config=api/all \
+  --service-account-key-file=/var/lib/kubernetes/service-account.pem \
+  --service-cluster-ip-range=10.32.0.0/24 \
+  --service-node-port-range=30000-32767 \
+  --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
+  --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \
   --v=2
 Restart=on-failure
 RestartSec=5
@@ -191,18 +191,18 @@ Description=Kubernetes Controller Manager
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
-ExecStart=/usr/local/bin/kube-controller-manager \\
-  --address=0.0.0.0 \\
-  --cluster-cidr=10.200.0.0/16 \\
-  --cluster-name=kubernetes \\
-  --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \\
-  --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \\
-  --kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
-  --leader-elect=true \\
-  --root-ca-file=/var/lib/kubernetes/ca.pem \\
-  --service-account-private-key-file=/var/lib/kubernetes/service-account-key.pem \\
-  --service-cluster-ip-range=10.32.0.0/24 \\
-  --use-service-account-credentials=true \\
+ExecStart=/usr/local/bin/kube-controller-manager \
+  --address=0.0.0.0 \
+  --cluster-cidr=10.200.0.0/16 \
+  --cluster-name=kubernetes \
+  --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \
+  --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \
+  --kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \
+  --leader-elect=true \
+  --root-ca-file=/var/lib/kubernetes/ca.pem \
+  --service-account-private-key-file=/var/lib/kubernetes/service-account-key.pem \
+  --service-cluster-ip-range=10.32.0.0/24 \
+  --use-service-account-credentials=true \
   --v=2
 Restart=on-failure
 RestartSec=5
@@ -345,8 +345,8 @@ Description=Kubernetes Scheduler
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
-ExecStart=/usr/local/bin/kube-scheduler \\
-  --config=/etc/kubernetes/config/kube-scheduler.yaml \\
+ExecStart=/usr/local/bin/kube-scheduler \
+  --config=/etc/kubernetes/config/kube-scheduler.yaml \
   --v=2
 Restart=on-failure
 RestartSec=5
@@ -520,7 +520,7 @@ resource "null_resource" "kube_health__check_service" {
 # Create the system:kube-apiserver-to-kubelet ClusterRole with permissions to access
 # the Kubelet API and perform most common tasks associated with managing pods:
 
-resource "null_resource" "cluster_role" {
+resource "null_resource" "cluster_rolee" {
   # count = "${length(var.controller_node_names)}"
   depends_on = ["null_resource.kube_health__check_service"]
   connection {
@@ -555,9 +555,9 @@ resource "null_resource" "cluster_role" {
 
 # Bind the system:kube-apiserver-to-kubelet ClusterRole to the kubernetes user:
 
-resource "null_resource" "cluster_role_binding" {
+resource "null_resource" "cluster_role_bindingg" {
   #count = "${length(var.controller_node_names)}"
-  depends_on = ["null_resource.cluster_role"]
+  depends_on = ["null_resource.cluster_rolee"]
   connection {
     type         = "ssh"
     host = "${element(var.controller_dns_names,0)}"
@@ -584,5 +584,10 @@ resource "null_resource" "cluster_role_binding" {
     */
     script = "${path.module}/scripts/clusterRoleBinding-script.sh"
   }
+  /*
+  provisioner "remote-exec" {
+    script = "${path.module}/scripts/devoteam-user.sh"
+  }
+  */
 }
                              

@@ -2,7 +2,7 @@
 
 echo "cluster RBAC role creating .................."
 
-cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
+cat <<EOF | kubectl apply -f -
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
@@ -26,3 +26,5 @@ EOF
 
 echo "Cluster role created .............."
 echo done
+
+# --kubeconfig admin.kubeconfig

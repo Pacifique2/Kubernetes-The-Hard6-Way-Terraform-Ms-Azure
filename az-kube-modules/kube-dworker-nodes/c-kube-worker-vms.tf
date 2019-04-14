@@ -11,7 +11,7 @@ resource "azurerm_availability_set" "zone" {
 
 
 resource "azurerm_public_ip" "vm_pip" {
-  count               = "${var.controller_count}"
+  count               = "${var.worker_count}"
   name                = "${var.node_prefix}-pip-${count.index}"
   location            = "${var.rs_location}"
   resource_group_name = "${var.rs_name}"
@@ -23,7 +23,7 @@ resource "azurerm_public_ip" "vm_pip" {
 }
 
 resource "azurerm_network_interface" "main" {                                        
-  count = "${var.controller_count}"
+  count = "${var.worker_count}"
   name                = "${var.node_prefix}-${count.index}-nic"                                         
   location            = "${var.rs_location}"                   
   resource_group_name = "${var.rs_name}"                       
@@ -42,14 +42,6 @@ resource "azurerm_network_interface" "main" {
   }                                                               
 }
 
-/*                                                                                   
-resource "azurerm_network_interface_backend_address_pool_association" "lb_backend_pool_nics" {
-  count                   = "${var.controller_count}"
-  network_interface_id    = "${azurerm_network_interface.main.*.id[count.index]}"
-  ip_configuration_name   = "${var.node_prefix}-${count.index}-ip-config"
-  backend_address_pool_id = "${var.lb_backend_pool}"
-}
-*/
 /*
 # Generate random text for a unique storage account name
 resource "random_id" "randomId" {
@@ -91,7 +83,7 @@ resource "null_resource" "activate_ssh_agent_with_localhost_private_key" {
 # Provionning kube worker instances
 #########################################################                                                                             
 resource "azurerm_virtual_machine" "main" {                                         
-  count = "${var.controller_count}"
+  count = "${var.worker_count}"
   name                  = "${var.node_prefix}-${count.index}"                                        
   location              = "${var.rs_location}"                 
   availability_set_id = "${azurerm_availability_set.zone.id}"

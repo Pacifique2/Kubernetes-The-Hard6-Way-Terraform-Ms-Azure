@@ -10,7 +10,7 @@
                                                                                                                                                                           
 resource "null_resource" "kube_workers_binaries" {                                                                                                                          
   count  = "${var.count}"                       
-  depends_on = ["null_resource.cluster_role_binding","azurerm_lb_rule.lb","null_resource.kube_api_server_version_test"] 
+  depends_on = ["null_resource.cluster_role_bindingg","azurerm_lb_rule.lb","null_resource.kube_api_server_version_testt"] 
   connection {                                                                                                                                                            
     type         = "ssh"                                                                                                                                                  
     host = "${element(var.worker_nodes_dns_names,count.index)}"                                                                                                             

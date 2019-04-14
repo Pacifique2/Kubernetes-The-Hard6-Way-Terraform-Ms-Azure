@@ -32,6 +32,16 @@ variable "nodes_count" {
 variable "rsg_name" {
   default = "RG-Kube-Free"
 }
+variable "controller_vms_dpncy_ids" {
+  type        = "list"
+  description = "The ID of the controller vms resource ids for dependency"
+}
+
+variable "worker_vms_dpncy_ids" {
+  type        = "list"
+  description = "The ID of the worker vms resource ids for dependency"
+}
+
 #variable "rs_location" {}
 #variable "subnet_id" {}
 #variable "vnet_subnet_name" {} 

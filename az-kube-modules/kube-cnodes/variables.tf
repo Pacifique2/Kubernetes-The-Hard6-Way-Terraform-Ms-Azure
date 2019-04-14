@@ -13,11 +13,6 @@ variable "node" {}
 
 variable "controller_count" {
   description = "The count of controller VMs to create"
-  default = 2
-}
-
-variable "worker_count" {
-  description = "The count of worker nodes to create"
   default = 3
 }
 

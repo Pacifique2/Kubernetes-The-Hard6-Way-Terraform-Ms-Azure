@@ -141,14 +141,6 @@ resource "azurerm_virtual_machine" "main" {
   tags = {
     environment = "Terraform Demo"
   }
-  /*
-  connection {
-    type         = "ssh"
-    user         = "${var.username}"
-    host         = "${var.node_prefix}-${count.index}"
-    # bastion_host = "${var.public_ip}"
-  }
-  */
   connection {
     type         = "ssh"
     host = "${element(azurerm_public_ip.vm_pip.*.fqdn,count.index)}"

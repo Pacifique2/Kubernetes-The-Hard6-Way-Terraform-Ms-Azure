@@ -2,7 +2,7 @@
 
 echo "Cluster Role binding creating ...."
 
-cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
+cat <<EOF | kubectl apply -f -
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -19,3 +19,4 @@ subjects:
 EOF
 
 echo done
+# --kubeconfig admin.kubeconfig

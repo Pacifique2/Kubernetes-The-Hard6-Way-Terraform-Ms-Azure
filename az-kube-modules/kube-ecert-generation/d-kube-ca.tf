@@ -1,3 +1,5 @@
+
+
 resource "tls_private_key" "devo_kube_ca" {
   algorithm = "RSA"
   rsa_bits  = "2048"
@@ -9,7 +11,7 @@ resource "tls_self_signed_cert" "devo_kube_ca" {
 
   subject {
     common_name         = "Kubernetes"
-    organization        = "Kube-devoteam"
+    organization        = "Kubernetes"
     country             = "FR"
     locality            = "Hauts-de-Seine"
     organizational_unit = "CA"
@@ -53,7 +55,13 @@ resource "null_resource" "devo_ca_certs" {
     timeout      =  "1m"
     agent        = true
   }
+  provisioner "remote-exec" {
+    inline = [
+          "echo ${element(var.controller_vms_dpncy_ids, count.index)}",
+          "echo ${element(var.worker_vms_dpncy_ids, count.index)}",
+    ]
 
+  }
   provisioner "file" {
     source      = "./tls-certs/client-server/ca.pem"
     destination = "~/ca.pem"
@@ -80,7 +88,7 @@ resource "tls_cert_request" "devo_kube_admin" {
 
   subject {
     common_name         = "admin"
-    organization        = "Kube-devoteam"
+    organization        = "system:masters"
     country             = "FR"
     locality            = "Hauts-de-Seine"
     organizational_unit = "Kubernetes The Hard Way"
@@ -116,6 +124,110 @@ resource "local_file" "kube_admin_crt" {
   content  = "${tls_locally_signed_cert.devo_kube_admin.cert_pem}"
   filename = "./tls-certs/client-server/admin.pem"
 }
+
+####################################################################################
+# devoteam user
+####################################################################################
+resource "tls_private_key" "devo_kube_devoteam" {                           
+  algorithm = "RSA"                                                      
+  rsa_bits  = "2048"                                                     
+}                                                                        
+                                                                         
+resource "tls_cert_request" "devo_kube_devoteam" {                          
+  key_algorithm   = "${tls_private_key.devo_kube_devoteam.algorithm}"       
+  private_key_pem = "${tls_private_key.devo_kube_devoteam.private_key_pem}" 
+                                                                         
+  subject {                                                              
+    common_name         = "devoteam-pacy"                                        
+    organization        = "Devoteam"                               
+    country             = "FR"                                           
+    locality            = "Hauts-de-Seine"                               
+    organizational_unit = "Kubernetes The Hard Way"                      
+    province            = "Paris"                                        
+  }                                                                      
+}                                                                        
+
+resource "tls_locally_signed_cert" "devo_kube_devoteam" {
+  cert_request_pem   = "${tls_cert_request.devo_kube_devoteam.cert_request_pem}"
+  ca_key_algorithm   = "${tls_private_key.devo_kube_ca.algorithm}"
+  ca_private_key_pem = "${tls_private_key.devo_kube_ca.private_key_pem}"
+  ca_cert_pem        = "${tls_self_signed_cert.devo_kube_ca.cert_pem}"
+
+  validity_period_hours = 8760
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "client_auth",
+    "server_auth",
+  ]
+}
+
+resource "local_file" "kube_devoteam_key" {
+  depends_on = ["tls_private_key.devo_kube_devoteam"]
+  content  = "${tls_private_key.devo_kube_devoteam.private_key_pem}"
+  filename = "./tls-certs/client-server/devoteam-pacy-key.pem"
+}
+
+resource "local_file" "kube_devoteam_crt" {
+  depends_on = ["tls_locally_signed_cert.devo_kube_devoteam"]
+  content  = "${tls_locally_signed_cert.devo_kube_devoteam.cert_pem}"
+  filename = "./tls-certs/client-server/devoteam-pacy.pem"
+}
+
+#####################################################################################
+# Telecom Sud Paris user
+#####################################################################################
+
+resource "tls_private_key" "tsp_kube_tsp" {                            
+  algorithm = "RSA"                                                          
+  rsa_bits  = "2048"                                                         
+}                                                                            
+                                                                             
+resource "tls_cert_request" "tsp_kube_tsp" {                           
+  key_algorithm   = "${tls_private_key.tsp_kube_tsp.algorithm}"        
+  private_key_pem = "${tls_private_key.tsp_kube_tsp.private_key_pem}"  
+                                                                             
+  subject {                                                                  
+    common_name         = "tsp-pacy"                                    
+    organization        = "Telecom SudParis"                                         
+    country             = "FR"                                               
+    locality            = "Hauts-de-Seine"                                   
+    organizational_unit = "Kubernetes The Hard Way"                          
+    province            = "Paris"                                            
+  }                                                                          
+}                                                                            
+resource "tls_locally_signed_cert" "tsp_kube_tsp" {
+  cert_request_pem   = "${tls_cert_request.tsp_kube_tsp.cert_request_pem}"
+  ca_key_algorithm   = "${tls_private_key.devo_kube_ca.algorithm}"
+  ca_private_key_pem = "${tls_private_key.devo_kube_ca.private_key_pem}"
+  ca_cert_pem        = "${tls_self_signed_cert.devo_kube_ca.cert_pem}"
+
+  validity_period_hours = 8760
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "client_auth",
+    "server_auth",
+  ]
+}
+
+resource "local_file" "kube_tsp_key" {
+  depends_on = ["tls_private_key.tsp_kube_tsp"]
+  content  = "${tls_private_key.tsp_kube_tsp.private_key_pem}"
+  filename = "./tls-certs/client-server/tsp-pacy-key.pem"
+}
+
+resource "local_file" "kube_tsp_crt" {
+  depends_on = ["tls_locally_signed_cert.tsp_kube_tsp"]
+  content  = "${tls_locally_signed_cert.tsp_kube_tsp.cert_pem}"
+  filename = "./tls-certs/client-server/tsp-pacy.pem"
+}
+#####################################################################################
+
 
 
 ####################################################################################
@@ -198,7 +310,13 @@ resource "null_resource" "kubelet_certs" {
     timeout      =  "1m"
     agent        = true
   }
-
+  provisioner "remote-exec" {                                             
+    inline = [                                                            
+        "echo ${element(var.controller_vms_dpncy_ids, count.index)}",   
+        "echo ${element(var.worker_vms_dpncy_ids, count.index)}",       
+    ]                                                                     
+                                                                        
+  }                                                                       
   provisioner "file" {
     source      = "./tls-certs/kubelet/${element(var.kube_worker_node_names, count.index)}.pem"
     destination = "~/${element(var.kube_worker_node_names, count.index)}.pem"
@@ -222,7 +340,16 @@ resource "null_resource" "worker_ca_cert" {
     private_key  = "${file("~/.ssh/kube-devolab_id_rsa")}" 
     timeout      =  "1m"                                   
     agent        = true                                    
-  }                                                        
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+        "echo ${element(var.controller_vms_dpncy_ids, count.index)}",
+        "echo ${element(var.worker_vms_dpncy_ids, count.index)}",
+    ]
+
+  }  
+                                                        
   provisioner "file" {
     source      = "./tls-certs/client-server/ca.pem"
     destination = "~/ca.pem"
@@ -246,8 +373,8 @@ resource "tls_cert_request" "kube_controller_manager" {
   private_key_pem = "${tls_private_key.kube_controller_manager.private_key_pem}"
 
   subject {
-    common_name         = "system:kube-scheduler"
-    organization        = "system:kube-scheduler"
+    common_name         = "system:kube-controller-manager"
+    organization        = "system:kube-controller-manager"
     country             = "FR"
     locality            = "Hauts-de-Seine"
     organizational_unit = "Kubernetes The Hard Way"
@@ -467,7 +594,16 @@ resource "null_resource" "kubernetes_certs" {
     private_key  = "${file("~/.ssh/kube-devolab_id_rsa")}"       
     timeout      =  "1m"                                         
     agent        = true                                          
-  }                                                              
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+        "echo ${element(var.controller_vms_dpncy_ids, count.index)}",
+        "echo ${element(var.worker_vms_dpncy_ids, count.index)}",
+    ]
+
+  }  
+                                                              
   provisioner "file" {
     source      = "./tls-certs/kubernetes.pem"
     destination = "~/kubernetes.pem"
@@ -507,10 +643,10 @@ resource "tls_cert_request" "service-account" {
 
   subject {
     common_name         = "service-account"
-    organization        = "service-account"
+    organization        = "Kubernetes"
     country             = "FR"
     locality            = "Hauts-de-Seine"
-    organizational_unit = "service-account The Hard Way"
+    organizational_unit = "Kubernetes The Hard Way"
     province            = "Paris"
   }
 }
@@ -556,7 +692,16 @@ resource "null_resource" "service-account_certs" {
     private_key  = "${file("~/.ssh/kube-devolab_id_rsa")}"       
     timeout      =  "1m"                                         
     agent        = true                                          
-  }                                                              
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+        "echo ${element(var.controller_vms_dpncy_ids, count.index)}",
+        "echo ${element(var.worker_vms_dpncy_ids, count.index)}",
+    ]
+
+  }
+                                                              
   provisioner "file" {
     source      = "./tls-certs/service-account/service-account.pem"
     destination = "~/service-account.pem"

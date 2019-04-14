@@ -11,15 +11,11 @@ variable "node_prefix" {
 
 variable "node" {}
 
-variable "controller_count" {
-  description = "The count of controller VMs to create"
-  default = 2
-}
-
 variable "worker_count" {
   description = "The count of worker nodes to create"
-  default = 2
+  default = 3
 }
+
 /*
 
 variable "lb_backend_pool" {
@@ -33,7 +29,7 @@ variable "kube_subnet_id" {
 
 variable "ssh_key_data" {
   description = "The public SSH key to provision to the instance user"
-    #default   = "${file("~/.ssh/kube-devolab_id_rsa.pub")}"
+    # default   = "${file("~/.ssh/kube-devolab_id_rsa.pub")}"
 }
 
 variable "username" {}

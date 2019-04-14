@@ -1,7 +1,7 @@
 #################################################################################
 # Verify kube worker nodes
 ##################################################################################
-/*
+
 resource "null_resource" "kube_worker_nodes_verification" {
   #count  = "${var.count}"
   depends_on  = ["null_resource.start_worker_services"]
@@ -17,10 +17,11 @@ resource "null_resource" "kube_worker_nodes_verification" {
 
   provisioner "remote-exec" {
     inline = [
+      "echo 'verifying kubernetes worker nodes'",
       "kubectl get nodes",
     ]
   }
 }
-*/
+
 ################################################################################
 

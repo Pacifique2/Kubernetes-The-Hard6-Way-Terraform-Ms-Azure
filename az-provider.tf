@@ -129,7 +129,9 @@ module "certs" {
   # Create the pods cidr route table and deploy the core dns
   ####################################################################
   rsg_name = "${module.kube_vnet.rsg_name}"
-  
+  ####################################################################
+  controller_vms_dpncy_ids = "${module.master-nodes.controller_vms_ids}"
+  worker_vms_dpncy_ids = "${module.worker-nodes.worker_vms_ids}" 
   #rs_location = "${module.kube_vnet.rsg_location}"
   #subnet_id   = "${module.kube_vnet.subnet_id}"
   #vnet_subnet_name = "${module.kube_vnet.subnet_name}"
@@ -145,6 +147,7 @@ resource "null_resource" "provisioning" {
         command = "echo done"
     }
 }
+
 /*
 module "etcd" {
   source = "./az-kube-modules/kube-ecert-generation/kube-fetcd"

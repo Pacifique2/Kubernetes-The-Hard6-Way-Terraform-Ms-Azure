@@ -549,7 +549,7 @@ resource "null_resource" "cluster_role" {
   }
 }
 
-#############################################################################################
+############################################################################################
 # The Kubernetes API Server authenticates to the Kubelet as the kubernetes user using the client certificate 
 # as defined by the --kubelet-client-certificate flag.
 
