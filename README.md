@@ -28,7 +28,7 @@ Other modules other than the mentioned one, are for test purposes.
 The man terraform file of this project is named **az-provider.tf**.
 
 ## Prerequisites
-Despite the need to install PKI install from the original implementation of kuberntes the hard way, we wouldn't need to do so since we use terraform tls modules to automatically generate tls certifications.
+Despite the need to install PKI as done from the original implementation of kuberntes the hard way, we wouldn't need to do so since we use terraform tls modules to automatically generate tls certifications.
 
 We won't need to install the PKI tools such cfssl cfssljon as mentioned in the original kubernetes the hard way project.
 We don't need to install go either
@@ -49,11 +49,15 @@ This module created the kubernetes the load balancer rules within MS azure cloud
 This module created a set of linux virtual machines that would be used while boostrapping the kubernetes control plane within MS azure cloud platform.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-cnodes*
  
- ### az-modules/kube-cnodes
+ ### az-modules/kube-dworker-nodes
 This module created a set of linux virtual machines that would be used as kubernetes worker nodes.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-dworker-nodes*
  
- 
+ ### az-modules/kube-ecert-generation
+This module creates not only the certificates and kubernetes configurations files, but also all the remaining necessary resources and deployments to have a fully set up kubernetes cluster.
+ *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/d-kube-ca.tf*
+ All the remaing steps has their terraform files within the above module. The link is below:
+ *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-ecert-generation*
  
 ## Provisioning the CA and Generating TLS Certificates
 ## Generating Kubernetes Configuration Files for Authentication
@@ -91,5 +95,7 @@ By typing yes, terraform sets up the whole functionning  kubernetes cluster.
 Now, the cluster has generated a kubernetes config file in your local machine.
 Type kubectl config view;
 You will find three configured remote users that have beeen granted different permissions to interact with our new kubernetes cluster hosted on MS Azure.
+The first user is the **admin user** that have been granted permissions at the cluster-scope
+The other two remote users are first, a **devoteam-pacy user within the devoteam-apps namespace** and a **tsp-pacy user within telecom-sud-paris-apps kubernetes namespace** Each user has permissions to carry out applicaions deployments in the namespace to which he belongs. This means that devoteam-pacy user has no rights to deploy and view applications deployed within the telecom-sud-paris-apps kubernetes namespace and vice-versa.
  
 
