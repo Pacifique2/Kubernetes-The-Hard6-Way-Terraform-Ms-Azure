@@ -53,13 +53,15 @@ This module created a set of linux virtual machines that would be used while boo
 This module created a set of linux virtual machines that would be used as kubernetes worker nodes.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-dworker-nodes*
  
+## Provisioning the CA and Generating TLS Certificates
+
  ### az-modules/kube-ecert-generation
+ 
 This module creates not only the certificates and kubernetes configurations files, but also all the remaining necessary resources and deployments to have a fully set up kubernetes cluster.\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/d-kube-ca.tf*. \
  All the remaing steps have their terraform files within the above module. The link is below:\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-ecert-generation*
  
-## Provisioning the CA and Generating TLS Certificates
 ## Generating Kubernetes Configuration Files for Authentication
 ## Generating the Data Encryption Config and Key
 ## Bootstrapping the etcd Cluster
