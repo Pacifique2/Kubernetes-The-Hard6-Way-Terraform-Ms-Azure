@@ -10,7 +10,7 @@ In this project, we end up adding a special use case where we use the RBAC kuber
 
 # Cluster Details
 
-Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
+Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authorization.
 
  ## Kubernetes 1.13.0  
  ### https://github.com/kubernetes/kubernetes
@@ -24,7 +24,7 @@ Kubernetes The Hard Way guides you through bootstrapping a highly available Kube
 
 # Steps to bring up the kubernetes cluster
 
-We would like to note that our kubernetes implementation is tructured into modules that are all found into the **az-modules directory**.
+We would like to note that our kubernetes implementation is tructured into modules that are all found into the **az-kube-modules directory**.
 Other modules other than the mentioned one, are for test purposes.
 The man terraform file of this project is named **az-provider.tf**.
 
