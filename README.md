@@ -2,7 +2,7 @@
 
 This project highlights the basic steps to set up Kubernetes the hard way with terraform automation tool. This takes us through a complete automated implementation  to bring up a Kubernetes cluster. To do so, we use terraform hashicorp to provision and deploy the whole kubernetes ecosystem.
 
-Kubernetes The Hard Way is optimized for learning, which means taking the long route to ensure understand each task required to bootstrap a Kubernetes cluster.
+Kubernetes The Hard Way is optimized for learning, which means taking the long route to ensure a deep understanding of each required  task to bootstrap a Kubernetes cluster.
 
 Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
 
