@@ -36,7 +36,7 @@ We don't need to install go either
 
 ## Provisioning Compute Resources
 ### az-kube-modules/kube-avnet
- This module creates the overall resource group with supporting infrastructure, such as VNET, Subnet
+ This module creates the overall azure resource group with supporting infrastructure, such as Virtual Network, Security rules attached to a security group and a subnet eventually.
 *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-avnet*
 ### az-kube-modules/kube-bpip-lb
 This module created the kubernetes public ip and the load balancer within MS azure cloud platform.
