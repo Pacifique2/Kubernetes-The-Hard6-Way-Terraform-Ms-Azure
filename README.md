@@ -96,7 +96,7 @@ Clone the repo  **https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terrafo
 ## SSH
 Generate an SSH key which can be used to SSH to the Kubernetes vms instances which will be created within MS Azure public cloud. The generated public/private key pair should be generated in a folder matching the path found in the ssh_key_data variable for path to public key and make sure that both the public key and private key can be located from the .ssh directory. This will ensure that the Terraform **vm** files can read them correctly. Ensure that the ssh agent is running from your local machine that you used to clone the repo.
 
-Ensure that the AZURE credentials profile that you wish to use to run this project is specified correctly in your Azure CLI authentication to Azure portal . Ensure that your subscription id is configured  int azure prvider file before testing. 
+Ensure that the AZURE credentials profile that you wish to use to run this project is specified correctly in your Azure CLI authentication to Azure portal . Ensure that your subscription id is configured  into azure provider file before testing. 
 
 ## Install Terraform 
 ## Install kubectl
@@ -113,8 +113,8 @@ You will find three configured remote users that have beeen granted different pe
 The defined RBAC roles and roleBindings can be found at the link below: \
 *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/blob/master/az-kube-modules/kube-ecert-generation/scripts/users-rolesRoleBings.sh*
 
-The first user is the **admin user** that have been granted permissions at the cluster-scope
-The other two remote users are first, a **devoteam-pacy user within the devoteam-apps namespace** and a **tsp-pacy user within telecom-sud-paris-apps kubernetes namespace** Each user has permissions to carry out applicaions deployments in the namespace to which he belongs. This means that devoteam-pacy user has no rights to deploy and view applications deployed within the telecom-sud-paris-apps kubernetes namespace and vice-versa.
+The first user is the **admin user** that have been granted permissions at the cluster-scope.
+The other two remote users are first, a **devoteam-pacy user within the devoteam-apps namespace** and a **tsp-pacy user within telecom-sud-paris-apps kubernetes namespace**. Each user has permissions to carry out applicaions deployments in the namespace to which he belongs. This means that devoteam-pacy user has no rights to deploy and view applications deployed within the telecom-sud-paris-apps kubernetes namespace and vice-versa. 
 
 
  
