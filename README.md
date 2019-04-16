@@ -26,10 +26,10 @@ Kubernetes The Hard Way guides you through bootstrapping a highly available Kube
 
 We would like to note that our kubernetes implementation is tructured into modules that are all found into the **az-kube-modules directory**.
 Other modules other than the mentioned one, are for test purposes.
-The man terraform file of this project is named **az-provider.tf**.
+The main terraform file of this project is named **az-provider.tf**.
 
 ## Prerequisites
-Despite the need to install PKI as done from the original implementation of kuberntes the hard way, we wouldn't need to do so since we use terraform tls modules to automatically generate tls certifications.
+Despite the need to install **PKI (Public Key Infrastructure)** as done from the original implementation of kuberntes the hard way, we wouldn't need to do so since we use terraform tls modules to automatically generate tls certificates.
 
 We won't need to install the PKI tools such cfssl cfssljon as mentioned in the original kubernetes the hard way project.
 We don't need to install go either
