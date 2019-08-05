@@ -29,16 +29,24 @@ Other modules other than the mentioned one, are for test purposes.
 The main terraform file of this project is named **az-provider.tf**.
 
 ## Prerequisites
-Despite the need to install **PKI (Public Key Infrastructure)** as done from the original implementation of kuberntes the hard way, we wouldn't need to do so since we use terraform tls modules to automatically generate tls certificates.
+**********
+**********
+Despite the need to install necessary tools to provision a **PKI (Public Key Infrastructure)** as done from the original implementation of kubernetes the hard way, we wouldn't need to do so since we use terraform TLS modules to automatically create and manage TLS certificates that will be used to authenticate kubernetes components to the kube-apiserver.
 
-We won't need to install the PKI tools such cfssl cfssljon as mentioned in the original kubernetes the hard way project.
-We don't need to install go either
+We won't need to install the **PKI*** tools such cfssl cfssljson as mentioned in the original Kubernetes The Hard way project. We don't need to install go either. However, we would need to install the kubectl command line utility that is used to interact with the Kubernetes API Server. More about downloading and installing instructions for the remote Kubernetes API, kubectl, can be found in official Kubernetes docs.
 
 ## Provisioning Compute Resources
-### az-kube-modules/kube-avnet
+Kubernetes (K8S) requires a set of machines to host the K8S control plane and the worker nodes where containers are ultimately run. In this section, we will use Microsoft azure cloud platform to provision the required compute resources for running a secure and highly available K8S cluster in a single region. Before doing so, we need to set up a secure network so that network traffic can be securely distributed not only within our K8S model but also for managing traffic to and from the internet.
+
+Therefore, we dedicated a VNET for hosting the K8S cluster. We use one subnet within our network, that can handle up to 254 Azure virtual machines in case where they would be needed.
+### az-kube-modules/kube-avnet (Networking)
+We consider a large subnet within the created kubernetes virtual network, that can provision an wide IP address range to assign a private IP address to each node in the Kubernetes cluster. We provide the 10.240.0.0/24 IP address range that can host up to 254 compute instances. More information on how does Microsoft azure describe azure virtual network, security groups and subnets within networks, can be found in the official documentation of MS Azure.
+We create a firewall referred to us as a Network Security Group,  and we end up assigning  it to the previously created subnet. Then, we go on to create some firewall rules that allow incoming SSH and HTTPS traffic. Despite having established some network security rules, we will explain later how we use azure load balancer to expose the kubernetes api server component to the outside world. More details about azure load balancer, can be found in MS Azure docs.
  This module creates the overall azure resource group with supporting infrastructure, such as Virtual Network, Security rules attached to a security group and a subnet eventually.
 *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-avnet*
 ### az-kube-modules/kube-bpip-lb
+To make sure that we have a static kubernetes Ip address that will be used by the kubernetes API servers from the provisioned control plane's compute instances, we allocate a static public IP address that will be attached to the external load balancer fronting the Kubernetes API Servers. As highlighted on the proposed architecture of our Kubernetes the hard way implementation, we need to provision an external load balancer to front the Kubernetes API Servers. The previously created public static IP address will be attached to the resulting load balancer. The detailed implementation can be found below and the setup its health probe for the required Load Balancer rule are all created as shown on the link following the one that is here down.
+
 This module created the kubernetes public ip and the load balancer within MS azure cloud platform.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-bpip-lb*
  
@@ -46,11 +54,23 @@ This module created the kubernetes public ip and the load balancer within MS azu
 This module created the kubernetes the load balancer rules within MS azure cloud platform.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-lb-rules*
  
+ ### Kubernetes Nodes
+ As discussed earlier, both kubernetes control plane and workers are made of compute instances that are created depending on the chosen hosting platform. So, given that kubernetes nodes are all compute instances, we provisioned them using Ubuntu Server 18.04, from the fact that it has good support for the cri-containerd container runtime. Each compute instance is provisioned with a fixed private IP address that is chosen from the previously defined Ip range within the created Azure subnet. This lead us to simplified Kubernetes bootstrapping process.
+ 
  ### az-kube-modules/kube-cnodes
+ AS shown in the proposed architectural design of kubernetes the hard way, we created three compute instances which will host the Kubernetes control plane in one Availability Set. Azure uses the concept of availability sets to highlight them as a logical grouping capability that makes it possible to automatically isolate Virtual Machines' resources from each other when they're deployed.\
+This ensures that our provisioned compute instances remain operational even whenever a certain hardware or software might have faced some failure issues, hence, a reliable cloud based infrastructure solution that would ensure reliability and availability for hosting a ready to use kubernetes cluster.
+
 This module created a set of linux virtual machines that would be used while boostrapping the kubernetes control plane within MS azure cloud platform.\
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-cnodes*
  
  ### az-kube-modules/kube-dworker-nodes
+By following the same approach as the one under which we provisioned kubernetes master nodes, we provisioned  kubernetes worker nodes. However, we should not that there some requirements that need to be fulfilled before creating these instances. Since the worker nodes are the ones that run scheduled pods and kubernetes workloads, it is vital to allocate a pod subnet from the Kubernetes cluster cidr range for each worker instance.  The pod subnet allocation will later be used to configure container networking and set up pods routes table. The pod-cidr instance tag will be used to expose pod subnet allocations to compute instances at runtime.
+
+The Kubernetes cluster cidr range is defined by the Controller Manager's --cluster-cidr flag. Our implementation uses the cluster cidr range of 10.200.0.0/16, which can handle up to 254 subnets.
+
+We create three compute instances which will host the Kubernetes worker nodes in an Availability Set that is different from the one that was previously used when we provisioned the control plane's compute resources.
+ 
 This module created a set of linux virtual machines that would be used as kubernetes worker nodes.
  *https://github.com/Pacifique2/Kubernetes-The-Hard6-Way-Terraform-Ms-Azure/tree/master/az-kube-modules/kube-dworker-nodes*
  
